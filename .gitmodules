@@ -1,0 +1,7 @@
+[submodule "evelyn-python"]
+    path = evelyn-python
+    url = git@github.com:nalediym/evelyn-python.git
+
+[submodule "evelyn-elixir"]
+    path = evelyn-elixir
+    url = git@github.com/nalediym/evelyn-elixir.git
