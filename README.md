@@ -1,71 +1,12 @@
 # 🌟 Evelyn Multiverse Monorepo Guide
 
 ## 📚 Table of Contents
-1. [What is a Monorepo?](#what-is-a-monorepo)
-2. [Why Use a Monorepo?](#why-use-a-monorepo)
 3. [Evelyn's Architecture](#evelyns-architecture)
 4. [Understanding Git Submodules](#understanding-git-submodules)
 5. [Project Structure Explained](#project-structure-explained)
 6. [How to Work with Evelyn](#how-to-work-with-evelyn)
 7. [Common Commands](#common-commands)
 8. [Best Practices](#best-practices)
-
----
-
-## 🤔 What is a Monorepo?
-
-**Monorepo** = **Mono** (single) + **Repo** (repository)
-
-A **monorepo** is a single Git repository that contains multiple related projects or applications. Think of it like a big apartment building where each apartment (project) is separate, but they all share the same building (repository).
-
-### Traditional Approach vs Monorepo
-
-**Traditional Multi-Repo Approach:**
-```
-evelyn-frontend/     (separate repo)
-evelyn-backend/      (separate repo)  
-evelyn-mobile/       (separate repo)
-evelyn-docs/         (separate repo)
-```
-
-**Monorepo Approach:**
-```
-evelyn/              (single repo)
-├── frontend/
-├── backend/
-├── mobile/
-└── docs/
-```
-
-### Key Terms Explained
-
-- **Repository (Repo)**: A storage location for your code, managed by Git
-- **Submodule**: A Git repository inside another Git repository (like a nested repo)
-- **Meta-repository**: The main repository that contains and manages submodules
-- **Workspace**: The entire collection of projects in a monorepo
-- **Package**: An individual project or component within the monorepo
-
----
-
-## 🎯 Why Use a Monorepo?
-
-### ✅ Advantages
-
-1. **Unified Versioning**: All projects share the same version history
-2. **Atomic Changes**: Make changes across multiple projects in a single commit
-3. **Shared Dependencies**: Manage common libraries in one place
-4. **Simplified CI/CD**: One pipeline for all projects
-5. **Code Sharing**: Easy to share code between projects
-6. **Consistent Tooling**: Same linting, testing, and build tools across projects
-
-### ❌ Disadvantages
-
-1. **Large Repository Size**: Can become very large over time
-2. **Complex Permissions**: Harder to manage who can access what
-3. **Build Times**: May take longer to build everything
-4. **Learning Curve**: More complex for new team members
-
----
 
 ## 🏗️ Evelyn's Architecture
 
