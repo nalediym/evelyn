@@ -1,12 +1,12 @@
 # 🌟 Evelyn Multiverse Monorepo Guide
 
 ## 📚 Table of Contents
-3. [Evelyn's Architecture](#evelyns-architecture)
-4. [Understanding Git Submodules](#understanding-git-submodules)
-5. [Project Structure Explained](#project-structure-explained)
-6. [How to Work with Evelyn](#how-to-work-with-evelyn)
-7. [Common Commands](#common-commands)
-8. [Best Practices](#best-practices)
+1. [Evelyn's Architecture](#evelyns-architecture)
+2. [Understanding Git Submodules](#understanding-git-submodules)
+3. [Project Structure Explained](#project-structure-explained)
+4. [How to Work with Evelyn](#how-to-work-with-evelyn)
+5. [Common Commands](#common-commands)
+6. [Best Practices](#best-practices)
 
 ## 🏗️ Evelyn's Architecture
 
