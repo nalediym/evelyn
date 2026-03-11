@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evelyn End-State Demo</title>
+  <style>
+    :root {
+      --bg1: #071022;
+      --bg2: #0f1e3b;
+      --panel: rgba(12, 23, 46, 0.78);
+      --line: rgba(137, 172, 255, 0.28);
+      --text: #e8f0ff;
+      --muted: #9bb0d8;
+      --accent: #6ea2ff;
+      --ok: #4ee0a1;
+      --warn: #ffd06b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(115, 164, 255, 0.24), transparent 38%),
+        radial-gradient(circle at 85% 90%, rgba(49, 207, 177, 0.2), transparent 36%),
+        linear-gradient(145deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: clamp(1.5rem, 4vw, 2.2rem); }
+    .sub { color: var(--muted); margin-bottom: 18px; }
+    .note {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 16px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(10px);
+    }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .step.active { color: var(--text); outline: 1px solid var(--accent); }
+    .stage {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      min-height: 220px;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font-size: 12px; color: var(--muted); }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .controls { display: flex; justify-content: space-between; margin-top: 12px; }
+    button {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .primary { background: linear-gradient(135deg, #3b6de0, #2ca4bd); border: 0; }
+    .metric { margin-bottom: 10px; }
+    .bar { height: 8px; background: #1e315b; border-radius: 999px; overflow: hidden; margin-top: 6px; }
+    .fill { height: 100%; background: linear-gradient(90deg, #6ea2ff, #4ee0a1); }
+    .log { margin-top: 10px; color: var(--muted); font-size: 12px; white-space: pre-wrap; }
+    @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Evelyn: End-State Demo</h1>
+    <div class="sub">Target after current milestone: Python MVP complete + OpenAPI parity + CI confidence.</div>
+    <div class="note">This is a visual simulation of the finished experience: Dashboard -> Create Game -> Create World -> Publish + Share.</div>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="steps" id="steps"></div>
+        <div class="stage" id="stage"></div>
+        <div class="controls">
+          <button id="prev">Back</button>
+          <button class="primary" id="next">Continue</button>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="metric">
+          <strong>Contract Parity</strong>
+          <div id="parityText" class="sub">42/44 endpoints aligned</div>
+          <div class="bar"><div id="parityFill" class="fill" style="width:95%"></div></div>
+        </div>
+        <div class="metric">
+          <strong>CI Confidence</strong>
+          <div id="ciText" class="sub">7/8 checks green</div>
+          <div class="bar"><div id="ciFill" class="fill" style="width:88%"></div></div>
+        </div>
+        <div class="chips">
+          <span class="chip ok">pytest: pass</span>
+          <span class="chip ok">lint: pass</span>
+          <span class="chip warn">coverage: 83.9%</span>
+          <span class="chip ok">spec validation: pass</span>
+        </div>
+        <div id="log" class="log">run #2218 commit 14f7c9a
+pipeline: 7m18s</div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const flow = [
+      {
+        title: "Dashboard",
+        body: "Welcome back. 1 draft game, 2 worlds in progress.",
+        chips: ["active game: Nebula Cartographer", "milestone: on track", "creator mode"]
+      },
+      {
+        title: "Create Game",
+        body: "Game configured with title, slug, genre, and audience constraints.",
+        chips: ["slug validated", "schema checks pass", "version: 0.9.0-rc1"]
+      },
+      {
+        title: "Create World",
+        body: "World lore, events, and narrative constraints saved and linked to game.",
+        chips: ["events: 103", "npc templates: 47", "world validation pass"]
+      },
+      {
+        title: "Publish + Share",
+        body: "Publishing creates immutable snapshot and share URL for playtesting.",
+        chips: ["publish dry-run pass", "artifact packaged", "share link ready"]
+      }
+    ];
+
+    let idx = 0;
+    let published = false;
+    const stepsEl = document.getElementById("steps");
+    const stageEl = document.getElementById("stage");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+
+    function render() {
+      stepsEl.innerHTML = flow.map((s, i) => `<div class="step ${i===idx?"active":""}">${i+1}. ${s.title}</div>`).join("");
+      const s = flow[idx];
+      stageEl.innerHTML = `<h3>${s.title}</h3><p>${s.body}</p><div class="chips">${s.chips.map(c => `<span class="chip">${c}</span>`).join("")}</div>`;
+      prev.disabled = idx === 0;
+      next.textContent = idx < flow.length - 1 ? "Continue" : (published ? "Copy Share Link" : "Publish Now");
+    }
+
+    prev.onclick = () => { if (idx > 0) { idx--; render(); } };
+    next.onclick = () => {
+      if (idx < flow.length - 1) { idx++; render(); return; }
+      if (!published) {
+        published = true;
+        document.getElementById("parityText").textContent = "44/44 endpoints aligned";
+        document.getElementById("ciText").textContent = "8/8 checks green";
+        document.getElementById("parityFill").style.width = "100%";
+        document.getElementById("ciFill").style.width = "100%";
+        document.getElementById("log").textContent = "publish status: complete\nshare: https://play.evelyn.app/s/nebula-cartographer/pale-meridian-r7k2";
+        render();
+      } else {
+        navigator.clipboard.writeText("https://play.evelyn.app/s/nebula-cartographer/pale-meridian-r7k2");
+      }
+    };
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# HYPER.yaml -- Product evolution state
+# Auto-maintained by hyper-mode skill. Manual edits welcome.
+
+product:
+  name: "Evelyn"
+  atomic_unit: null         # Discovered in Phase 6. null until then.
+  icp: "creator-educators, student builders, indie community leads (ages 15-30)"
+  positioning: "Fastest path from idea to playable, shareable, remixable interactive experience"
+  repo: "~/Projects/evelyn"
+
+phase:
+  current: 0
+  entered: "2026-03-10"
+  history: []
+
+metrics:
+  total_commits: 7
+  total_days: 1
+  burst_count: 1
+  current_burst:
+    commits: 7
+    start_date: "2026-03-10"
+    days: 1
+  build_delete_ratio: null
+  lines_added: null
+  lines_deleted: null
+
+benchmarks:
+  source: "Hyperbrowser (548 commits, 38 days, Feb-Mar 2026)"
+  total_commits: 548
+  total_days: 38
+  burst_pattern: "3 bursts (79 + 428 + 41 commits), ~7 day gaps"
+  phases:
+    0: { label: "Spark", commits_at: 1, day: 1 }
+    1: { label: "Feel Alive", commits_at: 12, day: 2 }
+    2: { label: "AI Layer", commits_at: 60, day: 5 }
+    3: { label: "Wild Experiments", commits_at: 90, day: 8 }
+    4: { label: "Multi-User", commits_at: 130, day: 12 }
+    5: { label: "Tech Debt Reckoning", commits_at: 200, day: 15 }
+    6: { label: "Atomic Unit", commits_at: 350, day: 22 }
+    7: { label: "Kill Darlings", commits_at: 450, day: 28 }
+    8: { label: "Compound", commits_at: 548, day: 38 }
+
+shiny_things: []

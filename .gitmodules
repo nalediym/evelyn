@@ -4,8 +4,8 @@
 
 [submodule "evelyn-elixir"]
     path = evelyn-elixir
-    url = git@github.com/nalediym/evelyn-elixir.git
+	url = git@github.com:nalediym/evelyn-elixir.git
 
 [submodule "evelyn-specs"]
     path = evelyn-specs
-    url = git@github.com/nalediym/evelyn-specs.git
+	url = git@github.com:nalediym/evelyn-specs.git

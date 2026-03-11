@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Evelyn Competitor Matrix</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel-2: #1e2330;
+      --text: #e6eaf2;
+      --muted: #a8b0c3;
+      --line: #2b3344;
+      --accent: #4ec9a8;
+      --s1: #4a1c1c;
+      --s2: #5c3a1b;
+      --s3: #5a5721;
+      --s4: #2d5a2f;
+      --s5: #1f6b3b;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      background: radial-gradient(circle at 10% 0%, #1a2130 0%, var(--bg) 45%);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    h1, h2 {
+      margin: 0 0 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    h1 { font-size: 22px; }
+    h2 { font-size: 16px; color: var(--accent); }
+
+    p, li { color: var(--muted); margin: 0; }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: #121622;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+      font-size: 12px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #151b28;
+      color: #dbe3f5;
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    th:last-child, td:last-child { border-right: 0; }
+
+    .brand {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .score {
+      text-align: center;
+      font-weight: 700;
+      color: #f7f9ff;
+      min-width: 48px;
+    }
+    .s1 { background: var(--s1); }
+    .s2 { background: var(--s2); }
+    .s3 { background: var(--s3); }
+    .s4 { background: var(--s4); }
+    .s5 { background: var(--s5); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .bets {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .bets th, .bets td {
+      border: 1px solid var(--line);
+      padding: 8px;
+      vertical-align: top;
+    }
+
+    @media (max-width: 920px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .wrap { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <h1>Evelyn Competitor Matrix</h1>
+      <p>Landscape view of beginner-to-pro creator platforms. Scores are 1 (weak) to 5 (strong).</p>
+      <div class="meta">
+        <span class="chip">Focus: creation platforms</span>
+        <span class="chip">Lens: speed + publish + network effects</span>
+        <span class="chip">Updated: 2026-03-10</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Competitive Matrix + Score Heatmap (1-5)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Primary audience</th>
+              <th>Time-to-first-playable</th>
+              <th>Publish friction</th>
+              <th>Remix mechanics</th>
+              <th>Collaboration/social loop strength</th>
+              <th>Monetization path maturity</th>
+              <th>Learning curve</th>
+              <th>Best use case</th>
+              <th>Speed</th>
+              <th>Publish ease</th>
+              <th>Remix power</th>
+              <th>Social loop</th>
+              <th>Monetization</th>
+              <th>Learning ease</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="brand">Evelyn</td>
+              <td>New creators, educators, indie builders</td>
+              <td>Minutes (prompt-first workflow)</td>
+              <td>Low (single flow, fewer gate checks)</td>
+              <td>Template + fork + prompt adaptation</td>
+              <td>Medium (sharing exists, network loop early)</td>
+              <td>Early (needs stronger creator economy rails)</td>
+              <td>Low to medium</td>
+              <td>Fast ideation and shipping small interactive experiences</td>
+              <td class="score s5">5</td>
+              <td class="score s4">4</td>
+              <td class="score s4">4</td>
+              <td class="score s3">3</td>
+              <td class="score s2">2</td>
+              <td class="score s4">4</td>
+            </tr>
+            <tr>
+              <td>Scratch</td>
+              <td>Kids, schools, beginner coders</td>
+              <td>Minutes</td>
+              <td>Very low (publish to community directly)</td>
+              <td>Strong remixes in-project</td>
+              <td>Strong classroom + community loops</td>
+              <td>Very limited direct monetization</td>
+              <td>Very low</td>
+              <td>Learning logic and storytelling through blocks</td>
+              <td class="score s4">4</td>
+              <td class="score s5">5</td>
+              <td class="score s5">5</td>
+              <td class="score s4">4</td>
+              <td class="score s1">1</td>
+              <td class="score s5">5</td>
+            </tr>
+            <tr>
+              <td>GDevelop</td>
+              <td>No-code game makers, hobbyists</td>
+              <td>Hours</td>
+              <td>Medium (export/deploy choices)</td>
+              <td>Community examples, less native remix loop</td>
+              <td>Medium (community, less in-product social)</td>
+              <td>Moderate (ads/IAP possible with work)</td>
+              <td>Medium</td>
+              <td>2D game creation with visual events</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s2">2</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+            </tr>
+            <tr>
+              <td>Construct 3</td>
+              <td>Indie devs, educators, rapid 2D dev</td>
+              <td>Hours</td>
+              <td>Medium (tooling is smooth, exports vary)</td>
+              <td>Examples + asset marketplace</td>
+              <td>Medium-low (community mostly external)</td>
+              <td>Moderate (commercial-friendly engine)</td>
+              <td>Medium</td>
+              <td>Shipping polished 2D web/mobile games</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s2">2</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+            </tr>
+            <tr>
+              <td>Roblox</td>
+              <td>Young creators, studios, UGC entrepreneurs</td>
+              <td>Days</td>
+              <td>Medium (platform rules + QA expectations)</td>
+              <td>Strong through models/scripts/community kits</td>
+              <td>Very strong built-in social graph</td>
+              <td>Very strong creator economy</td>
+              <td>Medium-high (Lua + platform complexity)</td>
+              <td>Live-service social worlds and monetized UGC</td>
+              <td class="score s2">2</td>
+              <td class="score s3">3</td>
+              <td class="score s4">4</td>
+              <td class="score s5">5</td>
+              <td class="score s5">5</td>
+              <td class="score s2">2</td>
+            </tr>
+            <tr>
+              <td>Fortnite Creative / UEFN</td>
+              <td>Pro creators, studios, brand activations</td>
+              <td>Days to weeks</td>
+              <td>Medium-high (tooling + review + optimization)</td>
+              <td>Growing ecosystem, less direct remix than Roblox</td>
+              <td>Very strong distribution via Fortnite network</td>
+              <td>Strong engagement payouts</td>
+              <td>High (UEFN + Verse complexity)</td>
+              <td>High-fidelity experiences at scale</td>
+              <td class="score s2">2</td>
+              <td class="score s2">2</td>
+              <td class="score s3">3</td>
+              <td class="score s5">5</td>
+              <td class="score s5">5</td>
+              <td class="score s1">1</td>
+            </tr>
+            <tr>
+              <td>Core</td>
+              <td>PC UGC creators, modders</td>
+              <td>Days</td>
+              <td>Medium</td>
+              <td>Template-driven remixing</td>
+              <td>Medium (smaller active network)</td>
+              <td>Moderate (creator payouts exist)</td>
+              <td>Medium-high</td>
+              <td>Multiplayer prototypes with Unreal-based tooling</td>
+              <td class="score s2">2</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s2">2</td>
+            </tr>
+            <tr>
+              <td>Rec Room</td>
+              <td>Social creators, casual world builders</td>
+              <td>Hours to days</td>
+              <td>Medium</td>
+              <td>Room copying + invention economy</td>
+              <td>Strong social loop around play sessions</td>
+              <td>Moderate (token economy)</td>
+              <td>Medium</td>
+              <td>Social multiplayer rooms and events</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+              <td class="score s4">4</td>
+              <td class="score s4">4</td>
+              <td class="score s3">3</td>
+              <td class="score s3">3</td>
+            </tr>
+            <tr>
+              <td>Flowlab</td>
+              <td>Beginners, students, hobby game makers</td>
+              <td>Hours</td>
+              <td>Low-medium</td>
+              <td>Example projects, weaker social remix loop</td>
+              <td>Low-medium</td>
+              <td>Low-moderate</td>
+              <td>Low-medium</td>
+              <td>Simple browser-based 2D game learning</td>
+              <td class="score s3">3</td>
+              <td class="score s4">4</td>
+              <td class="score s3">3</td>
+              <td class="score s2">2</td>
+              <td class="score s2">2</td>
+              <td class="score s4">4</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <article class="card">
+        <h2>Where Evelyn Wins</h2>
+        <ul>
+          <li>Fastest path from idea to playable by reducing setup and technical ceremony.</li>
+          <li>Prompt-first creation feels more natural for non-programmers than logic graphs or code.</li>
+          <li>Lower cognitive overhead than heavyweight engines for early-stage experiments.</li>
+          <li>Great bridge for creators graduating from pure toy tools but not ready for pro stacks.</li>
+          <li>Can compound via reusable templates and remixable starter kits.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h2>Where Evelyn Is Weak Today</h2>
+        <ul>
+          <li>Monetization rails are immature versus Roblox/Fortnite creator economies.</li>
+          <li>Social discovery and retention loops are not yet platform-defining.</li>
+          <li>Remix graph visibility (who remixed what, what performs) needs stronger UX.</li>
+          <li>Proof of scale for teams and larger productions is still limited.</li>
+          <li>Brand trust and ecosystem depth trail long-established incumbents.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>Positioning + ICP</h2>
+      <p><strong>Positioning statement:</strong> Evelyn is the fastest way for new and emerging creators to turn a game or interactive idea into something playable, shareable, and remixable, without the engine complexity tax.</p>
+      <p style="margin-top: 10px;"><strong>Suggested ICP + beachhead:</strong> creator-educators, student builders, and indie community leads (ages ~15-30) who run small Discord or classroom cohorts and want to publish frequent mini-experiences. Beachhead channel: cohort-based challenges ("ship in 30 minutes") with remix tournaments.</p>
+    </section>
+
+    <section class="card">
+      <h2>Three Strategic Bets (Next 90 Days)</h2>
+      <table class="bets">
+        <thead>
+          <tr>
+            <th>Bet</th>
+            <th>Why now</th>
+            <th>Measurable outcome by day 90</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1) Remix Graph + one-click fork UX</td>
+            <td>Turn every project into distribution and reduce blank-canvas drop-off.</td>
+            <td>Remix rate >= 30% of published projects; D1 creator retention +12 pts.</td>
+          </tr>
+          <tr>
+            <td>2) Creator challenge loops (weekly prompts + leaderboard)</td>
+            <td>Create recurring social reasons to return and publish.</td>
+            <td>4 weekly challenges launched; WAU/MAU >= 0.45; median publishes per active creator from 1.2 to 2.0.</td>
+          </tr>
+          <tr>
+            <td>3) Lightweight monetization pilot (tips, paid templates, rev-share)</td>
+            <td>Monetization proof is required to attract serious creators and partners.</td>
+            <td>Top 100 creators onboarded; >= 20% attempt monetization; GMV target $25k cumulative.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
