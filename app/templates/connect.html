@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter the Dream - Evelyn</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <a href="/" class="logo">evelyn</a>
+    </div>
+
+    <!-- step 1: authenticate -->
+    <div id="step-auth" class="card">
+      <div class="auth-section">
+        <div class="fingerprint-icon">&#128396;&#65039;</div>
+        <h2>Touch to enter</h2>
+        <p class="description">Your fingerprint is your identity. No passwords. No usernames.</p>
+        <div class="btn-row" style="justify-content: center; margin-top: 20px">
+          <button id="btn-register" class="btn primary">First time? Register</button>
+          <button id="btn-login" class="btn">Returning? Sign in</button>
+        </div>
+        <div id="auth-status" class="status" style="display: none"></div>
+      </div>
+    </div>
+
+    <!-- step 2: connect your world -->
+    <div id="step-connect" class="card" style="display: none">
+      <h2>Feed the dream</h2>
+      <p class="description">The more you share, the more vivid your dream becomes. This info stays on your device for now.</p>
+
+      <div class="profile-section">
+        <div class="field">
+          <label>Your name (or a dream name)</label>
+          <input type="text" id="player-name" placeholder="What should the dream call you?">
+        </div>
+
+        <div class="field">
+          <label>Places that matter to you</label>
+          <input type="text" id="player-places" placeholder="Cape Town, grandma's kitchen, the rooftop at night">
+        </div>
+
+        <div class="field">
+          <label>Things you're into</label>
+          <input type="text" id="player-interests" placeholder="horror films, cooking, afrobeats, cats">
+        </div>
+
+        <div class="field">
+          <label>Pick your colors</label>
+          <div class="chip-group multi" data-field="colors">
+            <span class="chip" data-value="#2a1f3d" style="background:#2a1f3d;color:#e8e8f0">deep purple</span>
+            <span class="chip" data-value="#f4a261" style="background:#f4a261;color:#0a0a0f">sunset</span>
+            <span class="chip" data-value="#264653" style="background:#264653;color:#e8e8f0">deep teal</span>
+            <span class="chip" data-value="#e76f51" style="background:#e76f51;color:#0a0a0f">ember</span>
+            <span class="chip" data-value="#a78bfa" style="background:#a78bfa;color:#0a0a0f">lavender</span>
+            <span class="chip" data-value="#1d3557" style="background:#1d3557;color:#e8e8f0">midnight</span>
+            <span class="chip" data-value="#e9c46a" style="background:#e9c46a;color:#0a0a0f">gold</span>
+            <span class="chip" data-value="#606c38" style="background:#606c38;color:#e8e8f0">moss</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-enter" class="btn primary large" style="width: 100%; margin-top: 20px">Enter the dream</button>
+      <div id="connect-status" class="status" style="display: none"></div>
+    </div>
+
+    <!-- step 3: generating -->
+    <div id="step-loading" class="card" style="display: none">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p class="loading-text">Dreaming your version...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GAME_ID = "{{ game.id }}";
+
+    // ── chip selection ──
+    document.querySelectorAll('.chip-group.multi .chip').forEach(chip => {
+      chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    });
+
+    // ── helpers ──
+    function showStep(id) {
+      document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+    }
+
+    function showStatus(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `status ${type}`;
+      el.style.display = 'block';
+    }
+
+    function bufferToBase64url(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let str = '';
+      bytes.forEach(b => str += String.fromCharCode(b));
+      return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function base64urlToBuffer(base64url) {
+      const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+      const pad = base64.length % 4;
+      const padded = pad ? base64 + '='.repeat(4 - pad) : base64;
+      const binary = atob(padded);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    // ── WebAuthn registration ──
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      try {
+        const optRes = await fetch('/api/auth/register/options', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        const options = await optRes.json();
+
+        // Convert base64url fields to ArrayBuffers
+        options.challenge = base64urlToBuffer(options.challenge);
+        options.user.id = base64urlToBuffer(options.user.id);
+        if (options.excludeCredentials) {
+          options.excludeCredentials = options.excludeCredentials.map(c => ({
+            ...c, id: base64urlToBuffer(c.id),
+          }));
+        }
+
+        const credential = await navigator.credentials.create({ publicKey: options });
+
+        const body = {
+          id: credential.id,
+          rawId: bufferToBase64url(credential.rawId),
+          type: credential.type,
+          response: {
+            attestationObject: bufferToBase64url(credential.response.attestationObject),
+            clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+          },
+        };
+
+        const verifyRes = await fetch('/api/auth/register/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (verifyRes.ok) {
+          showStatus('auth-status', 'Identity registered. You are you.', 'success');
+          setTimeout(() => showStep('step-connect'), 800);
+        } else {
+          const err = await verifyRes.json();
+          showStatus('auth-status', err.detail || 'Registration failed', 'error');
+        }
+      } catch (err) {
+        showStatus('auth-status', `Error: ${err.message}`, 'error');
+      }
+    });
+
+    // ── WebAuthn login ──
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      try {
+        const optRes = await fetch('/api/auth/login/options', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        const options = await optRes.json();
+
+        options.challenge = base64urlToBuffer(options.challenge);
+        if (options.allowCredentials) {
+          options.allowCredentials = options.allowCredentials.map(c => ({
+            ...c, id: base64urlToBuffer(c.id),
+          }));
+        }
+
+        const credential = await navigator.credentials.get({ publicKey: options });
+
+        const body = {
+          id: credential.id,
+          rawId: bufferToBase64url(credential.rawId),
+          type: credential.type,
+          response: {
+            authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+            clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+            signature: bufferToBase64url(credential.response.signature),
+            userHandle: credential.response.userHandle
+              ? bufferToBase64url(credential.response.userHandle) : null,
+          },
+        };
+
+        const verifyRes = await fetch('/api/auth/login/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (verifyRes.ok) {
+          showStatus('auth-status', 'Welcome back, dreamer.', 'success');
+          setTimeout(() => showStep('step-connect'), 800);
+        } else {
+          const err = await verifyRes.json();
+          showStatus('auth-status', err.detail || 'Login failed', 'error');
+        }
+      } catch (err) {
+        showStatus('auth-status', `Error: ${err.message}`, 'error');
+      }
+    });
+
+    // ── enter the dream ──
+    document.getElementById('btn-enter').addEventListener('click', async () => {
+      const name = document.getElementById('player-name').value.trim();
+      const places = document.getElementById('player-places').value.split(',').map(s => s.trim()).filter(Boolean);
+      const interests = document.getElementById('player-interests').value.split(',').map(s => s.trim()).filter(Boolean);
+      const colors = [...document.querySelectorAll('[data-field="colors"] .chip.selected')]
+        .map(c => c.dataset.value);
+
+      // save profile
+      await fetch('/api/player/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ display_name: name || 'Dreamer', places, interests, colors }),
+      });
+
+      // generate the dream
+      showStep('step-loading');
+
+      try {
+        const res = await fetch(`/api/games/${GAME_ID}/generate`, { method: 'POST' });
+        if (res.ok) {
+          const gameData = await res.json();
+          // Store in sessionStorage and redirect to play
+          sessionStorage.setItem('evelyn_game', JSON.stringify(gameData));
+          window.location.href = `/play/${GAME_ID}`;
+        } else {
+          showStep('step-connect');
+          showStatus('connect-status', 'Dream generation failed. Try again.', 'error');
+        }
+      } catch (err) {
+        showStep('step-connect');
+        showStatus('connect-status', `Error: ${err.message}`, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

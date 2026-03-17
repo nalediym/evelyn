@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Dream - Evelyn</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <a href="/" class="logo">evelyn</a>
+    </div>
+
+    <div class="card">
+      <h2>Create a dream</h2>
+      <p class="description">Set the genre, mood, and aesthetic. AI builds the game. Every player gets their own version.</p>
+
+      <form id="create-form">
+        <div class="field">
+          <label>Genre</label>
+          <div class="chip-group" data-field="genre">
+            <span class="chip" data-value="horror">horror</span>
+            <span class="chip" data-value="adventure">adventure</span>
+            <span class="chip" data-value="puzzle">puzzle</span>
+            <span class="chip" data-value="chill">chill</span>
+            <span class="chip" data-value="surreal">surreal</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Mood (pick a few)</label>
+          <div class="chip-group multi" data-field="mood">
+            <span class="chip" data-value="eerie">eerie</span>
+            <span class="chip" data-value="nostalgic">nostalgic</span>
+            <span class="chip" data-value="dreamy">dreamy</span>
+            <span class="chip" data-value="tense">tense</span>
+            <span class="chip" data-value="peaceful">peaceful</span>
+            <span class="chip" data-value="melancholy">melancholy</span>
+            <span class="chip" data-value="playful">playful</span>
+            <span class="chip" data-value="uncanny">uncanny</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Aesthetic (pick a few)</label>
+          <div class="chip-group multi" data-field="aesthetic">
+            <span class="chip" data-value="lo-fi">lo-fi</span>
+            <span class="chip" data-value="polaroid">polaroid</span>
+            <span class="chip" data-value="neon">neon</span>
+            <span class="chip" data-value="warm">warm</span>
+            <span class="chip" data-value="monochrome">monochrome</span>
+            <span class="chip" data-value="vaporwave">vaporwave</span>
+            <span class="chip" data-value="film-grain">film grain</span>
+            <span class="chip" data-value="watercolor">watercolor</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Describe the dream</label>
+          <textarea id="prompt" placeholder="You're lost in a house that feels familiar but nothing is where it should be..."></textarea>
+        </div>
+
+        <button type="submit" class="btn primary large" style="width: 100%">Create dream</button>
+      </form>
+
+      <div id="result" class="status" style="display: none"></div>
+    </div>
+  </div>
+
+  <script>
+    // chip selection
+    document.querySelectorAll('.chip-group').forEach(group => {
+      const isMulti = group.classList.contains('multi');
+      group.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          if (isMulti) {
+            chip.classList.toggle('selected');
+          } else {
+            group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+          }
+        });
+      });
+    });
+
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const result = document.getElementById('result');
+
+      const genre = document.querySelector('[data-field="genre"] .chip.selected');
+      if (!genre) {
+        result.textContent = 'Pick a genre first.';
+        result.className = 'status error';
+        result.style.display = 'block';
+        return;
+      }
+
+      const moods = [...document.querySelectorAll('[data-field="mood"] .chip.selected')]
+        .map(c => c.dataset.value);
+      const aesthetics = [...document.querySelectorAll('[data-field="aesthetic"] .chip.selected')]
+        .map(c => c.dataset.value);
+      const prompt = document.getElementById('prompt').value;
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
+      try {
+        const res = await fetch('/api/games', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            genre: genre.dataset.value,
+            mood: moods.join(','),
+            aesthetic: aesthetics.join(','),
+            prompt,
+          }),
+        });
+        const data = await res.json();
+
+        result.innerHTML = `Dream created. <a href="${data.url}" style="color: var(--accent)">${window.location.origin}${data.url}</a>`;
+        result.className = 'status success';
+        result.style.display = 'block';
+      } catch (err) {
+        result.textContent = `Error: ${err.message}`;
+        result.className = 'status error';
+        result.style.display = 'block';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Create dream';
+    });
+  </script>
+</body>
+</html>
