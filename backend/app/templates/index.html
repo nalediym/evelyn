@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evelyn Micro-Game Builder</title>
+    <link rel="stylesheet" href="/static/micro-game.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/json-logic-js@2.0.5/logic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/dist/pocketbase.umd.js"></script>
+</head>
+<body>
+    <main class="app">
+        <section class="title-panel panel">
+            <p class="eyebrow">Evelyn prototype</p>
+            <h1>Make a micro-game in 5 minutes</h1>
+            <p class="subtitle">Build tiny game actions with blocks, run them in Phaser, and save the project in PocketBase.</p>
+        </section>
+
+        <section class="workspace-grid">
+            <div class="panel blockly-panel">
+                <div class="panel-header">
+                    <h2>Logic blocks</h2>
+                    <button id="run-actions" class="button primary">Run actions</button>
+                </div>
+                <div id="blockly-editor"></div>
+                <xml id="toolbox" style="display:none">
+                    <category name="Actions" colour="#4f7dff">
+                        <block type="micro_action"></block>
+                    </category>
+                    <category name="Flow" colour="#00a070">
+                        <block type="controls_repeat_ext"></block>
+                    </category>
+                </xml>
+            </div>
+
+            <div class="panel game-panel">
+                <div class="panel-header">
+                    <h2>Phaser playground</h2>
+                    <button id="reset-game" class="button">Reset</button>
+                </div>
+                <div id="phaser-stage"></div>
+                <p id="game-status" class="status">Ready. Add blocks and press Run actions.</p>
+            </div>
+        </section>
+
+        <section class="panel persistence-panel">
+            <div class="panel-header">
+                <h2>PocketBase project save</h2>
+            </div>
+            <div class="field-row">
+                <label for="pocketbase-url">PocketBase URL</label>
+                <input id="pocketbase-url" type="text" placeholder="http://127.0.0.1:8090">
+            </div>
+            <div class="field-row">
+                <label for="project-name">Project name</label>
+                <input id="project-name" type="text" placeholder="my-first-micro-game">
+            </div>
+            <div class="button-row">
+                <button id="save-project" class="button primary">Save project</button>
+                <button id="load-project" class="button">Load project</button>
+            </div>
+            <p class="status" id="storage-status">Not connected yet. Uses collection name: micro_games</p>
+        </section>
+    </main>
+
+    <script src="/static/micro-game.js"></script>
+</body>
+</html>

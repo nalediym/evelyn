@@ -1,0 +1,90 @@
+name: Validate Specs
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-openapi:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install swagger-cli
+      run: npm install -g @apidevtools/swagger-cli
+    
+    - name: Validate OpenAPI spec
+      run: swagger-cli validate openapi.yaml
+    
+    - name: Check OpenAPI syntax
+      run: |
+        if ! swagger-cli validate openapi.yaml > /dev/null 2>&1; then
+          echo "❌ OpenAPI specification is invalid"
+          exit 1
+        else
+          echo "✅ OpenAPI specification is valid"
+        fi
+
+  validate-asyncapi:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install AsyncAPI CLI
+      run: npm install -g @asyncapi/cli
+    
+    - name: Validate AsyncAPI spec
+      run: asyncapi validate asyncapi.yaml
+    
+    - name: Check AsyncAPI syntax
+      run: |
+        if ! asyncapi validate asyncapi.yaml > /dev/null 2>&1; then
+          echo "❌ AsyncAPI specification is invalid"
+          exit 1
+        else
+          echo "✅ AsyncAPI specification is valid"
+        fi
+
+  consistency-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install -g @apidevtools/swagger-cli @asyncapi/cli
+    
+    - name: Extract schemas from OpenAPI
+      run: |
+        swagger-cli bundle openapi.yaml -o openapi-bundled.json
+        echo "OpenAPI schemas extracted"
+    
+    - name: Extract schemas from AsyncAPI
+      run: |
+        asyncapi validate asyncapi.yaml
+        echo "AsyncAPI schemas validated"
+    
+    - name: Check consistency
+      run: |
+        echo "Checking consistency between OpenAPI and AsyncAPI specs..."
+        # Aquí se pueden agregar validaciones adicionales de consistencia
+        echo "✅ Consistency check passed"

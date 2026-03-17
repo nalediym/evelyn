@@ -1,0 +1,467 @@
+asyncapi: 3.0.0
+info:
+  title: Evelyn Multiverse Storytelling Events
+  version: 1.0.0
+  description: |
+    Especificación AsyncAPI para eventos en tiempo real de la plataforma Evelyn.
+    Maneja eventos de storytelling multiverso, notificaciones de mundos efímeros
+    y comunicación en tiempo real entre creadores y participantes.
+  contact:
+    name: Evelyn Team
+    email: dev@evelyn-multiverse.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  development:
+    host: localhost:4000
+    protocol: ws
+    description: Servidor WebSocket de desarrollo
+  production:
+    host: ws.evelyn-multiverse.com
+    protocol: wss
+    description: Servidor WebSocket de producción
+
+defaultContentType: application/json
+
+channels:
+  world-events:
+    address: /worlds/{worldId}/events
+    title: Eventos de Mundo
+    description: Canal para eventos relacionados con un mundo específico
+    parameters:
+      worldId:
+        $ref: '#/components/parameters/WorldId'
+    messages:
+      worldCreated:
+        $ref: '#/components/messages/WorldCreated'
+      worldUpdated:
+        $ref: '#/components/messages/WorldUpdated'
+      worldExpired:
+        $ref: '#/components/messages/WorldExpired'
+      storyAdded:
+        $ref: '#/components/messages/StoryAdded'
+      storyUpdated:
+        $ref: '#/components/messages/StoryUpdated'
+
+  user-events:
+    address: /users/{userId}/events
+    title: Eventos de Usuario
+    description: Canal para eventos relacionados con un usuario específico
+    parameters:
+      userId:
+        $ref: '#/components/parameters/UserId'
+    messages:
+      userJoined:
+        $ref: '#/components/messages/UserJoined'
+      userLeft:
+        $ref: '#/components/messages/UserLeft'
+      notificationReceived:
+        $ref: '#/components/messages/NotificationReceived'
+
+  global-events:
+    address: /global/events
+    title: Eventos Globales
+    description: Canal para eventos globales del sistema
+    messages:
+      systemMaintenance:
+        $ref: '#/components/messages/SystemMaintenance'
+      newWorldAvailable:
+        $ref: '#/components/messages/NewWorldAvailable'
+
+operations:
+  subscribeWorldEvents:
+    action: receive
+    channel:
+      $ref: '#/channels/world-events'
+    summary: Suscribirse a eventos de mundo
+    description: Permite a los clientes suscribirse a eventos de un mundo específico
+
+  subscribeUserEvents:
+    action: receive
+    channel:
+      $ref: '#/channels/user-events'
+    summary: Suscribirse a eventos de usuario
+    description: Permite a los clientes suscribirse a eventos de un usuario específico
+
+  subscribeGlobalEvents:
+    action: receive
+    channel:
+      $ref: '#/channels/global-events'
+    summary: Suscribirse a eventos globales
+    description: Permite a los clientes suscribirse a eventos globales del sistema
+
+components:
+  parameters:
+    WorldId:
+      description: ID único del mundo
+      location: $message.payload#/worldId
+
+    UserId:
+      description: ID único del usuario
+      location: $message.payload#/userId
+
+  messages:
+    WorldCreated:
+      name: WorldCreated
+      title: Mundo Creado
+      summary: Evento emitido cuando se crea un nuevo mundo
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/WorldCreatedEvent'
+
+    WorldUpdated:
+      name: WorldUpdated
+      title: Mundo Actualizado
+      summary: Evento emitido cuando se actualiza un mundo existente
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/WorldUpdatedEvent'
+
+    WorldExpired:
+      name: WorldExpired
+      title: Mundo Expirado
+      summary: Evento emitido cuando un mundo expira
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/WorldExpiredEvent'
+
+    StoryAdded:
+      name: StoryAdded
+      title: Historia Agregada
+      summary: Evento emitido cuando se agrega una nueva historia a un mundo
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/StoryAddedEvent'
+
+    StoryUpdated:
+      name: StoryUpdated
+      title: Historia Actualizada
+      summary: Evento emitido cuando se actualiza una historia existente
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/StoryUpdatedEvent'
+
+    UserJoined:
+      name: UserJoined
+      title: Usuario Conectado
+      summary: Evento emitido cuando un usuario se conecta al sistema
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UserJoinedEvent'
+
+    UserLeft:
+      name: UserLeft
+      title: Usuario Desconectado
+      summary: Evento emitido cuando un usuario se desconecta del sistema
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UserLeftEvent'
+
+    NotificationReceived:
+      name: NotificationReceived
+      title: Notificación Recibida
+      summary: Evento emitido cuando un usuario recibe una notificación
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/NotificationReceivedEvent'
+
+    SystemMaintenance:
+      name: SystemMaintenance
+      title: Mantenimiento del Sistema
+      summary: Evento emitido para notificar sobre mantenimiento del sistema
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/SystemMaintenanceEvent'
+
+    NewWorldAvailable:
+      name: NewWorldAvailable
+      title: Nuevo Mundo Disponible
+      summary: Evento emitido cuando hay un nuevo mundo disponible
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/NewWorldAvailableEvent'
+
+  schemas:
+    WorldCreatedEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - worldId
+        - world
+      properties:
+        eventType:
+          type: string
+          const: world.created
+        timestamp:
+          type: string
+          format: date-time
+        worldId:
+          type: string
+          format: uuid
+        world:
+          $ref: '#/components/schemas/WorldData'
+
+    WorldUpdatedEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - worldId
+        - changes
+      properties:
+        eventType:
+          type: string
+          const: world.updated
+        timestamp:
+          type: string
+          format: date-time
+        worldId:
+          type: string
+          format: uuid
+        changes:
+          type: object
+          description: Campos que fueron modificados
+          additionalProperties: true
+
+    WorldExpiredEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - worldId
+      properties:
+        eventType:
+          type: string
+          const: world.expired
+        timestamp:
+          type: string
+          format: date-time
+        worldId:
+          type: string
+          format: uuid
+
+    StoryAddedEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - worldId
+        - storyId
+        - story
+      properties:
+        eventType:
+          type: string
+          const: story.added
+        timestamp:
+          type: string
+          format: date-time
+        worldId:
+          type: string
+          format: uuid
+        storyId:
+          type: string
+          format: uuid
+        story:
+          $ref: '#/components/schemas/StoryData'
+
+    StoryUpdatedEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - worldId
+        - storyId
+        - changes
+      properties:
+        eventType:
+          type: string
+          const: story.updated
+        timestamp:
+          type: string
+          format: date-time
+        worldId:
+          type: string
+          format: uuid
+        storyId:
+          type: string
+          format: uuid
+        changes:
+          type: object
+          description: Campos que fueron modificados
+          additionalProperties: true
+
+    UserJoinedEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - userId
+        - user
+      properties:
+        eventType:
+          type: string
+          const: user.joined
+        timestamp:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/UserData'
+
+    UserLeftEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - userId
+      properties:
+        eventType:
+          type: string
+          const: user.left
+        timestamp:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+
+    NotificationReceivedEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - userId
+        - notification
+      properties:
+        eventType:
+          type: string
+          const: notification.received
+        timestamp:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+        notification:
+          $ref: '#/components/schemas/NotificationData'
+
+    SystemMaintenanceEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - message
+        - scheduledAt
+      properties:
+        eventType:
+          type: string
+          const: system.maintenance
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          description: Duración estimada en minutos
+
+    NewWorldAvailableEvent:
+      type: object
+      required:
+        - eventType
+        - timestamp
+        - worldId
+        - world
+      properties:
+        eventType:
+          type: string
+          const: world.available
+        timestamp:
+          type: string
+          format: date-time
+        worldId:
+          type: string
+          format: uuid
+        world:
+          $ref: '#/components/schemas/WorldData'
+
+    WorldData:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [active, paused, expired]
+
+    StoryData:
+      type: object
+      required:
+        - id
+        - title
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        status:
+          type: string
+          enum: [draft, published, archived]
+
+    UserData:
+      type: object
+      required:
+        - id
+        - username
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+
+    NotificationData:
+      type: object
+      required:
+        - id
+        - type
+        - message
+        - priority
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [info, warning, error, success]
+        message:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        data:
+          type: object
+          additionalProperties: true
