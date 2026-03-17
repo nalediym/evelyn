@@ -6,16 +6,17 @@
   <title>Playing - Evelyn</title>
   <link rel="stylesheet" href="/static/style.css">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
 </head>
 <body>
   <div class="container">
     <div class="page-header">
       <a href="/" class="logo">evelyn</a>
+      <span class="meta" id="game-meta"></span>
     </div>
 
     <div class="game-header">
       <h1 id="game-title">Loading...</h1>
-      <p class="meta" id="game-meta"></p>
     </div>
 
     <div id="game-canvas"></div>
@@ -23,7 +24,10 @@
     <div class="game-ui">
       <div class="scene-description" id="scene-description"></div>
       <div class="interaction-text" id="interaction-text"></div>
-      <div class="game-nav" id="game-nav"></div>
+    </div>
+
+    <div class="game-controls-hint center" style="margin-top:12px">
+      <span class="meta">WASD / arrows to move &middot; W / space / up to jump &middot; collect dream fragments &middot; stomp enemies &middot; reach the portal</span>
     </div>
   </div>
 

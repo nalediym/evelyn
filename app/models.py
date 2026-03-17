@@ -46,6 +46,9 @@ class Player(SQLModel, table=True):
     aesthetic_data: Optional[str] = None
     colors_data: Optional[str] = None
 
+    # Full rich profile (quiz, browser signals, hesitations, extension data)
+    full_profile: Optional[str] = None
+
     created_at: datetime = Field(default_factory=_now)
 
 

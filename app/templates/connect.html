@@ -6,6 +6,140 @@
   <title>Enter the Dream - Evelyn</title>
   <link rel="stylesheet" href="/static/style.css">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .reveal-container {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .fingerprint-touch {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 24px;
+      background: rgba(167, 139, 250, 0.05);
+    }
+
+    .fingerprint-touch:hover {
+      border-color: var(--accent);
+      background: rgba(167, 139, 250, 0.1);
+      transform: scale(1.05);
+    }
+
+    .fingerprint-touch.pulse {
+      animation: fp-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes fp-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.3); }
+      50% { box-shadow: 0 0 0 20px rgba(167, 139, 250, 0); }
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .reveal-line {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      color: var(--muted);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.6s ease-out;
+      margin: 6px 0;
+      min-height: 1.4em;
+    }
+
+    .reveal-line.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-line.highlight {
+      color: var(--accent);
+    }
+
+    .reveal-line.warm {
+      color: var(--warm);
+    }
+
+    .reveal-line.eerie {
+      color: var(--danger);
+      font-style: italic;
+    }
+
+    .reveal-lines {
+      text-align: left;
+      max-width: 400px;
+      margin: 30px auto;
+    }
+
+    .reveal-lines .reveal-line::before {
+      content: "\25B8 ";
+      opacity: 0.4;
+    }
+
+    .final-line {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .final-line::before { content: none !important; }
+
+    .progress-bar {
+      width: 300px;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 24px auto 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .progress-bar.visible { opacity: 1; }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease-out;
+    }
+
+    .extension-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      background: rgba(78, 201, 168, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(78, 201, 168, 0.2);
+      margin-top: 12px;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .extension-badge.visible { opacity: 1; }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -13,65 +147,32 @@
       <a href="/" class="logo">evelyn</a>
     </div>
 
-    <!-- step 1: authenticate -->
-    <div id="step-auth" class="card">
-      <div class="auth-section">
-        <div class="fingerprint-icon">&#128396;&#65039;</div>
-        <h2>Touch to enter</h2>
-        <p class="description">Your fingerprint is your identity. No passwords. No usernames.</p>
-        <div class="btn-row" style="justify-content: center; margin-top: 20px">
-          <button id="btn-register" class="btn primary">First time? Register</button>
-          <button id="btn-login" class="btn">Returning? Sign in</button>
+    <div class="reveal-container">
+      <!-- Phase 1: Auth -->
+      <div id="phase-auth">
+        <div class="fingerprint-touch pulse" id="fp-icon">&#9757;&#127998;</div>
+        <h2 style="margin-bottom: 8px">Touch to enter</h2>
+        <p class="description" style="color: var(--muted); font-size: 0.85rem; max-width: 320px; margin: 0 auto;">
+          Your fingerprint is your identity.<br>No passwords. No forms. No questions.
+        </p>
+        <div class="auth-buttons">
+          <button id="btn-register" class="btn primary">First time</button>
+          <button id="btn-login" class="btn">I've been here</button>
         </div>
         <div id="auth-status" class="status" style="display: none"></div>
       </div>
-    </div>
 
-    <!-- step 2: connect your world -->
-    <div id="step-connect" class="card" style="display: none">
-      <h2>Feed the dream</h2>
-      <p class="description">The more you share, the more vivid your dream becomes. This info stays on your device for now.</p>
+      <!-- Phase 2: Reading you + reveal -->
+      <div id="phase-reveal" style="display: none">
+        <div class="reveal-lines" id="reveal-lines"></div>
 
-      <div class="profile-section">
-        <div class="field">
-          <label>Your name (or a dream name)</label>
-          <input type="text" id="player-name" placeholder="What should the dream call you?">
+        <div class="extension-badge" id="extension-badge">
+          &#128065; Dream Lens connected
         </div>
 
-        <div class="field">
-          <label>Places that matter to you</label>
-          <input type="text" id="player-places" placeholder="Cape Town, grandma's kitchen, the rooftop at night">
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
         </div>
-
-        <div class="field">
-          <label>Things you're into</label>
-          <input type="text" id="player-interests" placeholder="horror films, cooking, afrobeats, cats">
-        </div>
-
-        <div class="field">
-          <label>Pick your colors</label>
-          <div class="chip-group multi" data-field="colors">
-            <span class="chip" data-value="#2a1f3d" style="background:#2a1f3d;color:#e8e8f0">deep purple</span>
-            <span class="chip" data-value="#f4a261" style="background:#f4a261;color:#0a0a0f">sunset</span>
-            <span class="chip" data-value="#264653" style="background:#264653;color:#e8e8f0">deep teal</span>
-            <span class="chip" data-value="#e76f51" style="background:#e76f51;color:#0a0a0f">ember</span>
-            <span class="chip" data-value="#a78bfa" style="background:#a78bfa;color:#0a0a0f">lavender</span>
-            <span class="chip" data-value="#1d3557" style="background:#1d3557;color:#e8e8f0">midnight</span>
-            <span class="chip" data-value="#e9c46a" style="background:#e9c46a;color:#0a0a0f">gold</span>
-            <span class="chip" data-value="#606c38" style="background:#606c38;color:#e8e8f0">moss</span>
-          </div>
-        </div>
-      </div>
-
-      <button id="btn-enter" class="btn primary large" style="width: 100%; margin-top: 20px">Enter the dream</button>
-      <div id="connect-status" class="status" style="display: none"></div>
-    </div>
-
-    <!-- step 3: generating -->
-    <div id="step-loading" class="card" style="display: none">
-      <div class="loading">
-        <div class="spinner"></div>
-        <p class="loading-text">Dreaming your version...</p>
       </div>
     </div>
   </div>
@@ -79,24 +180,11 @@
   <script>
     const GAME_ID = "{{ game.id }}";
 
-    // ── chip selection ──
-    document.querySelectorAll('.chip-group.multi .chip').forEach(chip => {
-      chip.addEventListener('click', () => chip.classList.toggle('selected'));
-    });
+    // ── state ──
+    const signals = {};
+    let extensionData = null;
 
     // ── helpers ──
-    function showStep(id) {
-      document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-      document.getElementById(id).style.display = 'block';
-    }
-
-    function showStatus(id, msg, type) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.className = `status ${type}`;
-      el.style.display = 'block';
-    }
-
     function bufferToBase64url(buffer) {
       const bytes = new Uint8Array(buffer);
       let str = '';
@@ -114,139 +202,413 @@
       return bytes.buffer;
     }
 
-    // ── WebAuthn registration ──
-    document.getElementById('btn-register').addEventListener('click', async () => {
-      try {
-        const optRes = await fetch('/api/auth/register/options', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-        const options = await optRes.json();
+    function sleep(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
 
-        // Convert base64url fields to ArrayBuffers
-        options.challenge = base64urlToBuffer(options.challenge);
-        options.user.id = base64urlToBuffer(options.user.id);
-        if (options.excludeCredentials) {
-          options.excludeCredentials = options.excludeCredentials.map(c => ({
-            ...c, id: base64urlToBuffer(c.id),
-          }));
-        }
+    // ── collect browser signals (runs immediately, silently) ──
+    async function collectSignals() {
+      const now = new Date();
+      signals.time_of_day = now.getHours();
+      signals.minutes = now.getMinutes();
+      signals.is_night = now.getHours() >= 22 || now.getHours() < 6;
+      signals.timestamp = now.toISOString();
+      signals.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      signals.language = navigator.language;
+      signals.dark_mode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      signals.screen_width = screen.width;
+      signals.screen_height = screen.height;
+      signals.is_touch = navigator.maxTouchPoints > 0;
+      signals.is_mobile = screen.width < 768;
+      signals.history_length = history.length;
+      signals.referrer = document.referrer || null;
+      signals.cpu_cores = navigator.hardwareConcurrency || null;
+      signals.device_memory = navigator.deviceMemory || null;
 
-        const credential = await navigator.credentials.create({ publicKey: options });
+      const nav = performance.getEntriesByType('navigation');
+      signals.navigation_type = nav.length ? nav[0].type : null;
 
-        const body = {
-          id: credential.id,
-          rawId: bufferToBase64url(credential.rawId),
-          type: credential.type,
-          response: {
-            attestationObject: bufferToBase64url(credential.response.attestationObject),
-            clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
-          },
-        };
-
-        const verifyRes = await fetch('/api/auth/register/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-
-        if (verifyRes.ok) {
-          showStatus('auth-status', 'Identity registered. You are you.', 'success');
-          setTimeout(() => showStep('step-connect'), 800);
-        } else {
-          const err = await verifyRes.json();
-          showStatus('auth-status', err.detail || 'Registration failed', 'error');
-        }
-      } catch (err) {
-        showStatus('auth-status', `Error: ${err.message}`, 'error');
+      if (navigator.connection) {
+        signals.connection_type = navigator.connection.effectiveType;
+        signals.connection_downlink = navigator.connection.downlink;
       }
-    });
 
-    // ── WebAuthn login ──
-    document.getElementById('btn-login').addEventListener('click', async () => {
       try {
-        const optRes = await fetch('/api/auth/login/options', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-        const options = await optRes.json();
+        const battery = await navigator.getBattery();
+        signals.battery_level = battery.level;
+        signals.battery_charging = battery.charging;
+      } catch (_) {}
 
-        options.challenge = base64urlToBuffer(options.challenge);
-        if (options.allowCredentials) {
-          options.allowCredentials = options.allowCredentials.map(c => ({
-            ...c, id: base64urlToBuffer(c.id),
-          }));
+      try {
+        const clip = await navigator.clipboard.readText();
+        if (clip && clip.length > 0 && clip.length < 200) {
+          signals.clipboard_text = clip;
         }
+      } catch (_) {}
 
-        const credential = await navigator.credentials.get({ publicKey: options });
-
-        const body = {
-          id: credential.id,
-          rawId: bufferToBase64url(credential.rawId),
-          type: credential.type,
-          response: {
-            authenticatorData: bufferToBase64url(credential.response.authenticatorData),
-            clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
-            signature: bufferToBase64url(credential.response.signature),
-            userHandle: credential.response.userHandle
-              ? bufferToBase64url(credential.response.userHandle) : null,
-          },
-        };
-
-        const verifyRes = await fetch('/api/auth/login/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
+      try {
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
         });
+        signals.latitude = pos.coords.latitude;
+        signals.longitude = pos.coords.longitude;
 
-        if (verifyRes.ok) {
-          showStatus('auth-status', 'Welcome back, dreamer.', 'success');
-          setTimeout(() => showStep('step-connect'), 800);
-        } else {
-          const err = await verifyRes.json();
-          showStatus('auth-status', err.detail || 'Login failed', 'error');
+        try {
+          const geo = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`,
+            { headers: { 'Accept-Language': navigator.language } }
+          );
+          if (geo.ok) {
+            const data = await geo.json();
+            signals.city = data.address?.city || data.address?.town || data.address?.village || null;
+            signals.country = data.address?.country || null;
+          }
+        } catch (_) {}
+      } catch (_) {}
+
+      const month = now.getMonth();
+      const southern = signals.latitude ? signals.latitude < 0 : false;
+      if (month >= 2 && month <= 4) signals.season = southern ? 'autumn' : 'spring';
+      else if (month >= 5 && month <= 7) signals.season = southern ? 'winter' : 'summer';
+      else if (month >= 8 && month <= 10) signals.season = southern ? 'spring' : 'autumn';
+      else signals.season = southern ? 'summer' : 'winter';
+
+      return signals;
+    }
+
+    // ── check for Chrome extension ──
+    function listenForExtension() {
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'evelyn-dream-lens') {
+          extensionData = e.data.profile;
+          document.getElementById('extension-badge').classList.add('visible');
         }
-      } catch (err) {
-        showStatus('auth-status', `Error: ${err.message}`, 'error');
+      });
+      window.postMessage({ type: 'evelyn-dream-lens-request' }, '*');
+    }
+
+    // ── build reveal lines from collected data ──
+    function buildRevealLines() {
+      const lines = [];
+      const h = signals.time_of_day;
+      const m = signals.minutes;
+      const timeStr = `${h}:${String(m).padStart(2, '0')}`;
+
+      // Location
+      if (signals.city && signals.country) {
+        lines.push({ text: `You're in ${signals.city}, ${signals.country}.`, style: '' });
+      } else if (signals.city) {
+        lines.push({ text: `You're in ${signals.city}.`, style: '' });
+      } else if (signals.country) {
+        lines.push({ text: `Somewhere in ${signals.country}.`, style: '' });
       }
-    });
 
-    // ── enter the dream ──
-    document.getElementById('btn-enter').addEventListener('click', async () => {
-      const name = document.getElementById('player-name').value.trim();
-      const places = document.getElementById('player-places').value.split(',').map(s => s.trim()).filter(Boolean);
-      const interests = document.getElementById('player-interests').value.split(',').map(s => s.trim()).filter(Boolean);
-      const colors = [...document.querySelectorAll('[data-field="colors"] .chip.selected')]
-        .map(c => c.dataset.value);
+      // Time
+      if (h >= 0 && h < 5) {
+        lines.push({ text: `It's ${timeStr}am. You should be asleep.`, style: 'eerie' });
+      } else if (h >= 22) {
+        lines.push({ text: `${timeStr}. Late. The dreams are strongest now.`, style: 'highlight' });
+      } else if (h >= 5 && h < 9) {
+        lines.push({ text: `Early morning. The dream is still fresh.`, style: '' });
+      } else {
+        lines.push({ text: `The middle of the day. An unusual time to dream.`, style: '' });
+      }
 
-      // save profile
+      // Season
+      const seasonLines = {
+        'summer': 'The air is warm. The dream sweats.',
+        'winter': 'Cold outside. The dream is sharp.',
+        'autumn': 'Things are falling away. Good time for a dream.',
+        'spring': 'Something is growing. The dream is restless.',
+      };
+      if (signals.season && seasonLines[signals.season]) {
+        lines.push({ text: seasonLines[signals.season], style: '' });
+      }
+
+      // Battery
+      if (signals.battery_level !== undefined) {
+        const pct = Math.round(signals.battery_level * 100);
+        if (pct <= 10) {
+          lines.push({ text: `${pct}% battery. The dream is dying with you.`, style: 'eerie' });
+        } else if (pct <= 20) {
+          lines.push({ text: `${pct}% battery. The dream is fading.`, style: 'eerie' });
+        } else if (pct <= 40) {
+          lines.push({ text: `${pct}% battery. It might not last.`, style: 'warm' });
+        }
+      }
+
+      // Referrer
+      if (signals.referrer) {
+        try {
+          const ref = new URL(signals.referrer).hostname.replace('www.', '');
+          if (ref.includes('twitter') || ref.includes('x.com'))
+            lines.push({ text: `You came from the timeline. Still scrolling.`, style: '' });
+          else if (ref.includes('instagram'))
+            lines.push({ text: `You came from the grid. Looking for something more.`, style: '' });
+          else if (ref.includes('whatsapp') || ref.includes('t.me') || ref.includes('messenger'))
+            lines.push({ text: `Someone sent you here.`, style: 'highlight' });
+          else if (ref.includes('reddit'))
+            lines.push({ text: `You came from the depths. Going deeper.`, style: '' });
+          else if (ref.includes('tiktok'))
+            lines.push({ text: `You were watching. Now you're inside.`, style: '' });
+          else if (ref.includes('youtube'))
+            lines.push({ text: `Done watching. Time to live it.`, style: '' });
+          else
+            lines.push({ text: `You came from somewhere. It doesn't matter now.`, style: '' });
+        } catch (_) {}
+      } else {
+        if (signals.navigation_type === 'reload')
+          lines.push({ text: `You came back. The dream remembers.`, style: 'highlight' });
+        else if (signals.history_length <= 2)
+          lines.push({ text: `You came straight here. Nothing else mattered.`, style: 'highlight' });
+        else
+          lines.push({ text: `You found this place on your own.`, style: '' });
+      }
+
+      // History depth
+      if (signals.history_length > 30) {
+        lines.push({ text: `${signals.history_length} pages deep tonight. Your mind won't stop.`, style: 'warm' });
+      } else if (signals.history_length > 15) {
+        lines.push({ text: `${signals.history_length} pages deep. Restless.`, style: '' });
+      }
+
+      // Clipboard
+      if (signals.clipboard_text) {
+        const clip = signals.clipboard_text.substring(0, 80);
+        lines.push({ text: `On your clipboard: "${clip}"`, style: 'eerie' });
+      }
+
+      // Device
+      if (signals.is_mobile) {
+        lines.push({ text: `You're holding this close. Intimate.`, style: '' });
+      }
+
+      // Connection
+      if (signals.connection_type === '2g' || signals.connection_type === 'slow-2g') {
+        lines.push({ text: `Weak signal. The dream is thin here.`, style: 'warm' });
+      }
+
+      // Dark mode
+      if (signals.dark_mode) {
+        lines.push({ text: `Dark mode. You prefer the shadows.`, style: '' });
+      } else {
+        lines.push({ text: `Light mode. Brave.`, style: '' });
+      }
+
+      // Extension data
+      if (extensionData) {
+        if (extensionData.tabs && extensionData.tabs.open_count > 30)
+          lines.push({ text: `${extensionData.tabs.open_count} tabs open. Your mind is screaming.`, style: 'eerie' });
+        else if (extensionData.tabs && extensionData.tabs.open_count > 15)
+          lines.push({ text: `${extensionData.tabs.open_count} tabs open. Your mind is loud.`, style: 'warm' });
+
+        if (extensionData.history && extensionData.history.is_night_owl)
+          lines.push({ text: `You do this a lot. The late-night browsing.`, style: '' });
+
+        if (extensionData.history && extensionData.history.browsing_intensity === 'heavy')
+          lines.push({ text: `You consume everything. The dream will too.`, style: 'eerie' });
+
+        const cats = extensionData.history?.top_categories;
+        if (cats) {
+          const top = Object.entries(cats).sort((a, b) => b[1] - a[1])[0];
+          if (top) {
+            const catLines = {
+              social: `Mostly social media. Looking for connection.`,
+              video: `You watch a lot. The dream will show you things.`,
+              coding: `A builder. The dream respects that.`,
+              music: `Music runs through you. The dream hears it.`,
+              gaming: `You play games. This one plays you.`,
+              news: `You track the world. The dream tracks you.`,
+              shopping: `Always looking for something. Maybe this is it.`,
+              streaming: `You watch. And watch. The dream watches back.`,
+            };
+            if (catLines[top[0]])
+              lines.push({ text: catLines[top[0]], style: 'highlight' });
+          }
+        }
+      }
+
+      // Final
+      lines.push({ text: `The dream sees enough.`, style: 'final-line highlight' });
+
+      return lines;
+    }
+
+    // ── animate the reveal ──
+    async function showReveal() {
+      document.getElementById('phase-auth').style.display = 'none';
+      document.getElementById('phase-reveal').style.display = 'block';
+
+      const container = document.getElementById('reveal-lines');
+      const progressBar = document.getElementById('progress-bar');
+      const progressFill = document.getElementById('progress-fill');
+
+      await sleep(600);
+
+      const lines = buildRevealLines();
+      const totalSteps = lines.length + 2;
+      let step = 0;
+
+      progressBar.classList.add('visible');
+
+      for (const line of lines) {
+        if (!line.text) continue;
+        const el = document.createElement('div');
+        el.className = `reveal-line ${line.style}`;
+        el.textContent = line.text;
+        container.appendChild(el);
+
+        await sleep(80);
+        el.classList.add('visible');
+
+        step++;
+        progressFill.style.width = `${(step / totalSteps) * 70}%`;
+
+        await sleep(700 + Math.random() * 500);
+      }
+
+      await sleep(500);
+      progressFill.style.width = '80%';
+
+      // Save profile
       await fetch('/api/player/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ display_name: name || 'Dreamer', places, interests, colors }),
+        body: JSON.stringify({
+          display_name: 'Dreamer',
+          browser_signals: signals,
+          extension_data: extensionData,
+        }),
       });
 
-      // generate the dream
-      showStep('step-loading');
+      progressFill.style.width = '90%';
 
+      // Generate dream
       try {
         const res = await fetch(`/api/games/${GAME_ID}/generate`, { method: 'POST' });
         if (res.ok) {
           const gameData = await res.json();
-          // Store in sessionStorage and redirect to play
           sessionStorage.setItem('evelyn_game', JSON.stringify(gameData));
+          progressFill.style.width = '100%';
+          await sleep(400);
           window.location.href = `/play/${GAME_ID}`;
         } else {
-          showStep('step-connect');
-          showStatus('connect-status', 'Dream generation failed. Try again.', 'error');
+          showError('The dream collapsed. Refresh to try again.');
         }
       } catch (err) {
-        showStep('step-connect');
-        showStatus('connect-status', `Error: ${err.message}`, 'error');
+        showError(`The dream broke: ${err.message}`);
       }
-    });
+    }
+
+    function showError(msg) {
+      const container = document.getElementById('reveal-lines');
+      const el = document.createElement('div');
+      el.className = 'reveal-line eerie visible';
+      el.textContent = msg;
+      container.appendChild(el);
+    }
+
+    // ── WebAuthn ──
+    async function onAuth(isRegister) {
+      try {
+        if (isRegister) {
+          const optRes = await fetch('/api/auth/register/options', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
+          const options = await optRes.json();
+
+          options.challenge = base64urlToBuffer(options.challenge);
+          options.user.id = base64urlToBuffer(options.user.id);
+          if (options.excludeCredentials) {
+            options.excludeCredentials = options.excludeCredentials.map(c => ({
+              ...c, id: base64urlToBuffer(c.id),
+            }));
+          }
+
+          const credential = await navigator.credentials.create({ publicKey: options });
+
+          const body = {
+            id: credential.id,
+            rawId: bufferToBase64url(credential.rawId),
+            type: credential.type,
+            response: {
+              attestationObject: bufferToBase64url(credential.response.attestationObject),
+              clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+            },
+          };
+
+          const verifyRes = await fetch('/api/auth/register/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+
+          if (!verifyRes.ok) {
+            const err = await verifyRes.json();
+            throw new Error(err.detail || 'Registration failed');
+          }
+        } else {
+          const optRes = await fetch('/api/auth/login/options', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          });
+          const options = await optRes.json();
+
+          options.challenge = base64urlToBuffer(options.challenge);
+          if (options.allowCredentials) {
+            options.allowCredentials = options.allowCredentials.map(c => ({
+              ...c, id: base64urlToBuffer(c.id),
+            }));
+          }
+
+          const credential = await navigator.credentials.get({ publicKey: options });
+
+          const body = {
+            id: credential.id,
+            rawId: bufferToBase64url(credential.rawId),
+            type: credential.type,
+            response: {
+              authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+              clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+              signature: bufferToBase64url(credential.response.signature),
+              userHandle: credential.response.userHandle
+                ? bufferToBase64url(credential.response.userHandle) : null,
+            },
+          };
+
+          const verifyRes = await fetch('/api/auth/login/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+
+          if (!verifyRes.ok) {
+            const err = await verifyRes.json();
+            throw new Error(err.detail || 'Login failed');
+          }
+        }
+
+        // Auth success → reveal
+        showReveal();
+
+      } catch (err) {
+        const el = document.getElementById('auth-status');
+        el.textContent = err.message;
+        el.className = 'status error';
+        el.style.display = 'block';
+      }
+    }
+
+    // ── bind ──
+    document.getElementById('btn-register').addEventListener('click', () => onAuth(true));
+    document.getElementById('btn-login').addEventListener('click', () => onAuth(false));
+
+    // ── start collecting everything immediately ──
+    collectSignals();
+    listenForExtension();
   </script>
 </body>
 </html>

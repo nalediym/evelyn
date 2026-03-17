@@ -221,12 +221,34 @@ async def update_profile(request: Request, session: Session = Depends(get_sessio
     data = await request.json()
     if "display_name" in data:
         player.display_name = data["display_name"]
+
+    # Legacy fields (keep for backward compat)
     if "places" in data:
         player.places_data = json.dumps(data["places"])
     if "interests" in data:
         player.interests_data = json.dumps(data["interests"])
     if "colors" in data:
         player.colors_data = json.dumps(data["colors"])
+
+    # Store the full rich profile (quiz, browser signals, hesitations, etc.)
+    rich_profile = {}
+    for key in (
+        "quiz", "hesitations", "reversals", "quiz_timing",
+        "browser_signals", "extension_data",
+    ):
+        if key in data:
+            rich_profile[key] = data[key]
+
+    if rich_profile:
+        # Merge with any existing profile data
+        existing = {}
+        if player.full_profile:
+            try:
+                existing = json.loads(player.full_profile)
+            except (json.JSONDecodeError, TypeError):
+                pass
+        existing.update(rich_profile)
+        player.full_profile = json.dumps(existing)
 
     session.add(player)
     session.commit()
